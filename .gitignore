@@ -1,0 +1,82 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# C extensions
+*.so
+
+# Distribution / packaging
+bin/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nosexml/
+coverage.xml
+*.cover
+*.py,cover
+.pytest_cache/
+
+# Flask & Database
+instance/
+.webassets-cache
+*.db
+*.sqlite3
+*.sqlite3-journal
+
+# Environments (Virtual Environments)
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# OS-specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editors and IDEs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# === Project-Specific Large Files & Machine Learning Models ===
+# These contain model weights and checkpoints which are too large for standard GitHub repos (limit is 100MB per file)
+final_model/
+checkpoints/
+
+# Datasets and processed JSONL files (Large files)
+# If you want to keep the 31MB dataset and JSONL splits locally to keep the repo clean, you can uncomment these:
+# dataset.csv
+# train.jsonl
+# eval.jsonl

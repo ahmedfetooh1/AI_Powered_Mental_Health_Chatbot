@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Mental Health Chatbot</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 800px;
+            height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+
+
+        .header {
+            background: linear-gradient(135deg, #1c2136 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .header h2 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            text-align: center;
+            margin: 0;
+        }
+
+        #logoutBtn {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: none;
+            padding: 6px 15px;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        #logoutBtn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .chat-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background-color: #ffffff;
+        }
+        
+        .message {
+            margin: 10px 0;
+            padding: 12px;
+            border-radius: 10px;
+            max-width: 80%;
+            width: fit-content;
+            word-wrap: break-word;
+            line-height: 1.5;
+        }
+
+        .user-message {
+          background: linear-gradient(135deg, #1c2136 0%, #764ba2 100%);
+          color: white;
+          margin-left: auto;
+          text-align: right;
+          clear: both;
+        }
+
+        .bot-message {
+            background-color: #e9ecef;
+            margin-right: auto;
+            text-align: left;
+            clear: both;
+        }
+        
+        .input-container {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #eee;
+            background: white;
+        }
+        
+        .input-container input {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-right: 12px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-container input:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 0 2px rgba(118, 75, 162, 0.1);
+        }
+
+        .input-container button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #1c2136 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: opacity 0.3s ease, transform 0.2s ease;
+        }
+
+        .input-container button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="mainApp">
+        <div class="header">
+            <button id="logoutBtn" onclick="logout()">Logout</button>
+            <h2 id="welcomeTitle">Mental Health Assistant</h2>
+        </div>
+        <div class="chat-container" id="chatContainer">
+            <div class="message bot-message">Hello! How are you feeling today? I remember our conversations to help you better.</div>
+        </div>
+        <div class="input-container">
+            <input type="text" id="messageInput" placeholder="Type your message..." dir="auto">
+            <button id="sendButton">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://127.0.0.1:8000';
+        let currentUser = localStorage.getItem('chat_username');
+
+        if (currentUser) {
+            showApp();
+        } else {
+            // Redirect to the new authentication page
+            window.location.href = '/login';
+        }
+
+        async function showApp() {
+            document.getElementById('mainApp').style.display = 'block';
+            document.getElementById('welcomeTitle').innerText = 'Mental Health Chatbot';
+            
+            try {
+                const response = await fetch(`${API_URL}/messages?username=${currentUser}`);
+                if (response.ok) {
+                    const messages = await response.json();
+                    document.getElementById('chatContainer').innerHTML = '';
+                    if (messages.length === 0) {
+                        addMessage(`Hello ${currentUser}! I am your dedicated Mental Health Assistant. I remember our conversations to help you better. How are you feeling today?`, false);
+                    } else {
+                        messages.forEach(m => addMessage(m.text, m.is_user));
+                    }
+                }
+            } catch (err) {
+                console.error("Error fetching history");
+            }
+        }
+
+
+        function logout() {
+            localStorage.removeItem('chat_username');
+            location.reload();
+        }
+
+        const chatContainer = document.getElementById('chatContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        
+        function addMessage(text, isUser) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message ' + (isUser ? 'user-message' : 'bot-message');
+            messageDiv.innerHTML = text; 
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        async function sendMessage(text) {
+            addMessage(text, true);
+            messageInput.value = '';
+
+            try {
+                const response = await fetch(`${API_URL}/classify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        text: text, 
+                        username: currentUser 
+                    })
+                });
+        
+                const result = await response.json();
+                addMessage(result.response, false);
+                
+            } catch (error) {
+                addMessage('Sorry, server connection error.', false);
+            }
+        }
+        
+        sendButton.addEventListener('click', () => {
+            const text = messageInput.value.trim();
+            if (text) sendMessage(text);
+        });
+
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const text = messageInput.value.trim();
+                if (text) sendMessage(text);
+            }
+        });
+    </script>
+</body>
+</html>
